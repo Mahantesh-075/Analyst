@@ -1,0 +1,11 @@
+.env
+__pycache__/
+.venv/
+.venv-linux/
+.pytest_cache/
+node_modules/
+dist/
+.mypy_cache/
+.ruff_cache/
+benchmarks/results/
+*.parquet

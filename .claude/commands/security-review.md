@@ -1,0 +1,1 @@
+Review the current diff against docs/SECURITY.md and CLAUDE.md invariants. For each changed file list: untrusted inputs touched, injection/authz/PII risks, missing tests. Output a prioritized findings list (blocker / should-fix / nit) and the exact tests to add.

@@ -1,0 +1,585 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nexon.ai/schemas/transform_step.json",
+  "title": "TransformStep",
+  "description": "GENERATED from the op registry; do not hand-edit once `make schemas` exists.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/rename_column"
+    },
+    {
+      "$ref": "#/$defs/cast_type"
+    },
+    {
+      "$ref": "#/$defs/trim_whitespace"
+    },
+    {
+      "$ref": "#/$defs/normalize_case"
+    },
+    {
+      "$ref": "#/$defs/standardize_missing"
+    },
+    {
+      "$ref": "#/$defs/impute"
+    },
+    {
+      "$ref": "#/$defs/drop_null_rows"
+    },
+    {
+      "$ref": "#/$defs/drop_duplicates"
+    },
+    {
+      "$ref": "#/$defs/parse_date"
+    },
+    {
+      "$ref": "#/$defs/handle_outliers"
+    },
+    {
+      "$ref": "#/$defs/map_values"
+    },
+    {
+      "$ref": "#/$defs/split_column"
+    },
+    {
+      "$ref": "#/$defs/drop_column"
+    },
+    {
+      "$ref": "#/$defs/mask_pii"
+    }
+  ],
+  "$defs": {
+    "rename_column": {
+      "type": "object",
+      "title": "rename_column",
+      "description": "Rename a column.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "rename_column"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "new_name": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_ ]{0,62}$"
+            }
+          },
+          "required": [
+            "column",
+            "new_name"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "cast_type": {
+      "type": "object",
+      "title": "cast_type",
+      "description": "Cast a column to a type.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "cast_type"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "to": {
+              "enum": [
+                "int",
+                "float",
+                "string",
+                "bool",
+                "date",
+                "datetime",
+                "category"
+              ]
+            },
+            "format": {
+              "type": "string"
+            },
+            "on_error": {
+              "enum": [
+                "null",
+                "fail"
+              ],
+              "default": "fail"
+            }
+          },
+          "required": [
+            "column",
+            "to"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "trim_whitespace": {
+      "type": "object",
+      "title": "trim_whitespace",
+      "description": "Strip leading/trailing and collapse internal whitespace.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "trim_whitespace"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "columns"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "normalize_case": {
+      "type": "object",
+      "title": "normalize_case",
+      "description": "Normalize string case.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "normalize_case"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "mode": {
+              "enum": [
+                "lower",
+                "upper",
+                "title"
+              ]
+            }
+          },
+          "required": [
+            "columns",
+            "mode"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "standardize_missing": {
+      "type": "object",
+      "title": "standardize_missing",
+      "description": "Convert listed tokens to true nulls.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "standardize_missing"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "tokens": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "columns",
+            "tokens"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "impute": {
+      "type": "object",
+      "title": "impute",
+      "description": "Fill nulls. 'constant' requires value.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "impute"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "strategy": {
+              "enum": [
+                "mean",
+                "median",
+                "mode",
+                "constant",
+                "forward_fill"
+              ]
+            },
+            "value": {}
+          },
+          "required": [
+            "column",
+            "strategy"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "drop_null_rows": {
+      "type": "object",
+      "title": "drop_null_rows",
+      "description": "Drop rows with nulls in the given columns.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "drop_null_rows"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "how": {
+              "enum": [
+                "any",
+                "all"
+              ],
+              "default": "any"
+            }
+          },
+          "required": [
+            "columns"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "drop_duplicates": {
+      "type": "object",
+      "title": "drop_duplicates",
+      "description": "Drop duplicate rows; subset omitted means all columns.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "drop_duplicates"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subset": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "keep": {
+              "enum": [
+                "first",
+                "last"
+              ],
+              "default": "first"
+            }
+          },
+          "required": []
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "parse_date": {
+      "type": "object",
+      "title": "parse_date",
+      "description": "Parse strings into dates.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "parse_date"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "format": {
+              "type": "string"
+            },
+            "dayfirst": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "required": [
+            "column"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "handle_outliers": {
+      "type": "object",
+      "title": "handle_outliers",
+      "description": "Flag, clip, or null outliers.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "handle_outliers"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "method": {
+              "enum": [
+                "iqr",
+                "zscore"
+              ]
+            },
+            "threshold": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "action": {
+              "enum": [
+                "flag",
+                "clip",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "column",
+            "method",
+            "action"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "map_values": {
+      "type": "object",
+      "title": "map_values",
+      "description": "Harmonize category values.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "map_values"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mapping": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "minProperties": 1
+            }
+          },
+          "required": [
+            "column",
+            "mapping"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "split_column": {
+      "type": "object",
+      "title": "split_column",
+      "description": "Split a column into several.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "split_column"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "delimiter": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8
+            },
+            "into": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 10
+            }
+          },
+          "required": [
+            "column",
+            "delimiter",
+            "into"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "drop_column": {
+      "type": "object",
+      "title": "drop_column",
+      "description": "Drop a column.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "drop_column"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "column"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    },
+    "mask_pii": {
+      "type": "object",
+      "title": "mask_pii",
+      "description": "Mask PII values.",
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "mask_pii"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "string",
+              "minLength": 1
+            },
+            "method": {
+              "enum": [
+                "hash",
+                "redact",
+                "partial"
+              ]
+            }
+          },
+          "required": [
+            "column",
+            "method"
+          ]
+        }
+      },
+      "required": [
+        "op",
+        "params"
+      ]
+    }
+  }
+}

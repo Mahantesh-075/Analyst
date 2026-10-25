@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nexon.ai/schemas/llm_proposal_output.json",
+  "title": "LLMProposalOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "column_semantics",
+    "proposals"
+  ],
+  "properties": {
+    "column_semantics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "column",
+          "semantic_type",
+          "description",
+          "confidence"
+        ],
+        "properties": {
+          "column": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_type": {
+            "enum": [
+              "id",
+              "category",
+              "currency",
+              "quantity",
+              "percentage",
+              "date",
+              "datetime",
+              "email",
+              "phone",
+              "person_name",
+              "address",
+              "free_text",
+              "boolean",
+              "measurement",
+              "other"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "maxItems": 60,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step",
+          "reason",
+          "confidence",
+          "severity"
+        ],
+        "properties": {
+          "step": {
+            "$ref": "transform_step.json"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 400
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

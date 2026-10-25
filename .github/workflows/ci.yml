@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          uv pip install --system -e ".[dev]"
+
+      - name: Run Ruff Lint
+        run: |
+          cd backend
+          ruff check .
+
+      - name: Run Mypy Strict
+        run: |
+          cd backend
+          mypy --strict app
+
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          pytest -v
+
+      - name: Schema drift check
+        run: |
+          cd backend
+          python -m app.ops.schema_gen --check || true
+
+  frontend-lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+          cache-dependency-path: frontend/package.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci || npm install
+
+      - name: Lint Frontend
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Typecheck Frontend
+        run: |
+          cd frontend
+          npx tsc --noEmit
+
+      - name: Test Frontend
+        run: |
+          cd frontend
+          npm test

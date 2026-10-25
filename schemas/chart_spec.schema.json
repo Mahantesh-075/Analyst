@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nexon.ai/schemas/chart_spec.json",
+  "title": "DashboardSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spec_version",
+    "title",
+    "kpis",
+    "charts",
+    "narrative"
+  ],
+  "properties": {
+    "spec_version": {
+      "const": "1.0"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "kpis": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "measure"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,40}$"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "measure": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "agg"
+            ],
+            "properties": {
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "agg": {
+                "enum": [
+                  "count",
+                  "count_distinct",
+                  "sum",
+                  "mean",
+                  "median",
+                  "min",
+                  "max"
+                ]
+              }
+            }
+          },
+          "format": {
+            "enum": [
+              "integer",
+              "decimal",
+              "currency",
+              "percent"
+            ],
+            "default": "decimal"
+          }
+        }
+      }
+    },
+    "charts": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "title",
+          "query",
+          "encoding",
+          "rationale"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,40}$"
+          },
+          "type": {
+            "enum": [
+              "bar",
+              "line",
+              "histogram",
+              "scatter",
+              "box",
+              "pie",
+              "table"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "query": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "measures"
+            ],
+            "properties": {
+              "dimensions": {
+                "type": "array",
+                "maxItems": 3,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "field"
+                  ],
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "bucket": {
+                      "enum": [
+                        "day",
+                        "week",
+                        "month",
+                        "quarter",
+                        "year"
+                      ]
+                    }
+                  }
+                }
+              },
+              "measures": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 4,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "agg",
+                    "as"
+                  ],
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "agg": {
+                      "enum": [
+                        "count",
+                        "count_distinct",
+                        "sum",
+                        "mean",
+                        "median",
+                        "min",
+                        "max"
+                      ]
+                    },
+                    "as": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9_]{0,40}$"
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "type": "array",
+                "maxItems": 10,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "field",
+                    "op",
+                    "value"
+                  ],
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "op": {
+                      "enum": [
+                        "eq",
+                        "ne",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte",
+                        "in",
+                        "between",
+                        "is_null",
+                        "not_null"
+                      ]
+                    },
+                    "value": {}
+                  }
+                }
+              },
+              "order_by": {
+                "type": "array",
+                "maxItems": 3,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "field"
+                  ],
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "dir": {
+                      "enum": [
+                        "asc",
+                        "desc"
+                      ],
+                      "default": "desc"
+                    }
+                  }
+                }
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000,
+                "default": 50
+              }
+            }
+          },
+          "encoding": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "x": {
+                "type": "string"
+              },
+              "y": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              },
+              "size": {
+                "type": "string"
+              }
+            }
+          },
+          "rationale": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "narrative": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "template",
+          "refs"
+        ],
+        "properties": {
+          "template": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Text with {{ref_id}} placeholders. Digits outside placeholders are rejected."
+          },
+          "refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
