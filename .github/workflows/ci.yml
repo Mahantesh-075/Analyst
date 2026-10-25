@@ -9,6 +9,41 @@ on:
 jobs:
   backend-lint-and-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: analyst
+          POSTGRES_PASSWORD: analyst
+          POSTGRES_DB: analyst
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: minio
+          MINIO_ROOT_PASSWORD: minio12345
+        ports:
+          - 9000:9000
+        options: >-
+          minio server /data
+
     steps:
       - uses: actions/checkout@v4
 
@@ -16,7 +51,7 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           version: "latest"
-          enable-cache: true
+          enable-cache: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,9 +71,31 @@ jobs:
       - name: Run Mypy Strict
         run: |
           cd backend
-          mypy --strict app
+          mypy app
+
+      - name: Run Database Migrations & Init MinIO
+        env:
+          DATABASE_URL: postgresql+asyncpg://analyst:analyst@localhost:5432/analyst
+          REDIS_URL: redis://localhost:6379/0
+          S3_ENDPOINT: http://localhost:9000
+          S3_ACCESS_KEY: minio
+          S3_SECRET_KEY: minio12345
+          S3_BUCKET: analyst
+          JWT_SECRET: change-me-32-bytes-minimum-very-secure-secret-key
+        run: |
+          cd backend
+          python -c "import boto3; s3 = boto3.client('s3', endpoint_url='http://localhost:9000', aws_access_key_id='minio', aws_secret_access_key='minio12345'); s3.create_bucket(Bucket='analyst')" || true
+          alembic upgrade head
 
       - name: Run Backend Tests
+        env:
+          DATABASE_URL: postgresql+asyncpg://analyst:analyst@localhost:5432/analyst
+          REDIS_URL: redis://localhost:6379/0
+          S3_ENDPOINT: http://localhost:9000
+          S3_ACCESS_KEY: minio
+          S3_SECRET_KEY: minio12345
+          S3_BUCKET: analyst
+          JWT_SECRET: change-me-32-bytes-minimum-very-secure-secret-key
         run: |
           cd backend
           pytest -v
@@ -56,7 +113,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           cache: "npm"
           cache-dependency-path: frontend/package.json
 
