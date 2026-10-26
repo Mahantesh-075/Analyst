@@ -1,4 +1,4 @@
-# Analyst — by Nexon AI Solutions
+# Analyst — by MAHANT
 Trust-first data preparation and insight platform for small businesses and NGOs.
 
 ## Using this pack with Claude Code
